@@ -1,48 +1,51 @@
-/* eslint-disable no-console */
-const movieModel = require("./movieModel");
+const scheduleModel = require("./scheduleModel");
 const helperWrapper = require("../../helpers/wrapper");
 
 module.exports = {
-  getAllMovie: async (request, response) => {
-    try {
-      let { page, limit } = request.query;
-      page = Number(page);
-      limit = Number(limit);
-      // OFFSET ?
-      // TAMBAHKAN OFFSET PEMBERIAN NILAI DEFAULT VALUE
-      const offset = page * limit - limit;
-      const totalData = await movieModel.getCountMovie();
-      const totalPage = Math.ceil(totalData / limit);
-      const pageInfo = {
-        page,
-        totalPage,
-        limit,
-        totalData,
-      };
+  getAllSchedule: async (req, res) => {
+    const searchBy = !req.query.searchBy ? "movieId" : req.query.searchBy;
+    const search = !req.query.search ? "" : req.query.search;
+    const sort = !req.query.sort ? "ASC" : req.query.sort;
+    const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
+    const page = !req.query.page ? "1" : Number(req.query.page);
+    const offset = page === 1 ? "0" : (page - 1) * dblimit;
+    const totalData = await scheduleModel.getCountSchedule();
+    const totalPage = Math.ceil(totalData / dblimit);
+    const pageInfo = {
+      page,
+      totalPage,
+      dblimit,
+      totalData,
+    };
 
-      const result = await movieModel.getAllMovie(limit, offset);
-      // response.status(200).send(result);
+    try {
+      const result = await scheduleModel.getAllSchedule(
+        searchBy,
+        search,
+        sort,
+        dblimit,
+        offset
+      );
       return helperWrapper.response(
-        response,
+        res,
         200,
         "Success get data",
         result,
         pageInfo
       );
     } catch (error) {
-      // response.status(400).send(error.message);
       return helperWrapper.response(
-        response,
+        res,
         400,
         `Bad request (${error.message})`,
         null
       );
     }
   },
-  getMovieByid: async (req, res) => {
+  getScheduleByid: async (req, res) => {
     try {
       const { id } = req.params;
-      const result = await movieModel.getMovieByid(id);
+      const result = await scheduleModel.getScheduleByid(id);
       if (result.length < 1) {
         return helperWrapper.response(
           res,
@@ -61,16 +64,19 @@ module.exports = {
       );
     }
   },
-  postMovie: async (req, res) => {
+  postSchedule: async (req, res) => {
     try {
-      const { name, category, releaseDate, synopsis } = req.body;
+      const { movieId, premiere, price, location, dateStart, dateEnd } =
+        req.body;
       const setData = {
-        name,
-        category,
-        releaseDate,
-        synopsis,
+        movieId,
+        premiere,
+        price,
+        location,
+        dateStart,
+        dateEnd,
       };
-      const result = await movieModel.postMovie(setData);
+      const result = await scheduleModel.postSchedule(setData);
       return helperWrapper.response(res, 200, "Success create data", result);
     } catch (error) {
       return helperWrapper.response(
@@ -81,10 +87,10 @@ module.exports = {
       );
     }
   },
-  updateMovie: async (req, res) => {
+  updateSchedule: async (req, res) => {
     try {
       const { id } = req.params;
-      const checkId = await movieModel.getMovieByid(id);
+      const checkId = await scheduleModel.getScheduleByid(id);
       if (checkId.length < 1) {
         return helperWrapper.response(
           res,
@@ -93,55 +99,42 @@ module.exports = {
           null
         );
       }
-      const {
-        name,
-        category,
-        releaseDate,
-        cast,
-        director,
-        duration,
-        synopsis,
-      } = req.body;
+      const { movieId, premiere, price, location, dateStart, dateEnd } =
+        req.body;
       const setData = {
-        name,
-        category,
-        releaseDate,
-        cast,
-        director,
-        duration,
-        synopsis,
+        movieId,
+        premiere,
+        price,
+        location,
+        dateStart,
+        dateEnd,
         updateAt: new Date(Date.now()),
       };
 
-      const result = await movieModel.updateMovie(setData, id);
+      const result = await scheduleModel.updateSchedule(setData, id);
       return helperWrapper.response(res, 200, "Success update data", result);
     } catch (error) {
       return helperWrapper.response(
         res,
-        400,
+        404,
         `Bad request (${error.message})`,
         null
       );
     }
   },
-  deleteMovie: async (req, res) => {
+  deleteSchedule: async (req, res) => {
     try {
       const { id } = req.params;
-      const checkId = await movieModel.getMovieByid(id);
+      const checkId = await scheduleModel.getScheduleByid(id);
       if (checkId.length < 1) {
         return helperWrapper.response(
           res,
           404,
-          `Data by id ${id} not found !`,
+          `Data by id ${id} not found`,
           null
         );
       }
-      // Proses delete
-      // return res.status(200).json({
-      //   status: true,
-      //   message: "Delete Data Success",
-      // });
-      const result = await movieModel.deleteMovie(id);
+      const result = await scheduleModel.deleteSchedule(id);
       return helperWrapper.response(res, 200, "Success update data", result);
     } catch (error) {
       return helperWrapper.response(
