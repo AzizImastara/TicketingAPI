@@ -3,36 +3,33 @@ const movieModel = require("./movieModel");
 const helperWrapper = require("../../helpers/wrapper");
 
 module.exports = {
-  getAllMovie: async (request, response) => {
-    try {
-      let { page, limit } = request.query;
-      page = Number(page);
-      limit = Number(limit);
-      // OFFSET ?
-      // TAMBAHKAN OFFSET PEMBERIAN NILAI DEFAULT VALUE
-      const offset = page * limit - limit;
-      const totalData = await movieModel.getCountMovie();
-      const totalPage = Math.ceil(totalData / limit);
-      const pageInfo = {
-        page,
-        totalPage,
-        limit,
-        totalData,
-      };
+  getAllMovie: async (req, res) => {
+    const seacrh = !req.query.seacrh ? "" : req.query.seacrh;
+    const sort = !req.query.sort ? "DESC" : req.query.sort;
+    const page = !req.query.page ? "1" : Number(req.query.page);
+    const limit = !req.query.limit ? "10" : Number(req.query.limit);
+    const offset = page === 1 ? "0" : (page - 1) * limit;
+    const totalData = await movieModel.getCountMovie();
+    const totalPage = Math.ceil(totalData / limit);
+    const pageInfo = {
+      page,
+      totalPage,
+      limit,
+      totalData,
+    };
 
-      const result = await movieModel.getAllMovie(limit, offset);
-      // response.status(200).send(result);
+    try {
+      const result = await movieModel.getAllMovie(seacrh, sort, limit, offset);
       return helperWrapper.response(
-        response,
+        res,
         200,
         "Success get data",
         result,
         pageInfo
       );
     } catch (error) {
-      // response.status(400).send(error.message);
       return helperWrapper.response(
-        response,
+        res,
         400,
         `Bad request (${error.message})`,
         null
@@ -63,11 +60,22 @@ module.exports = {
   },
   postMovie: async (req, res) => {
     try {
-      const { name, category, releaseDate, synopsis } = req.body;
+      const {
+        name,
+        category,
+        releaseDate,
+        cast,
+        director,
+        duration,
+        synopsis,
+      } = req.body;
       const setData = {
         name,
         category,
         releaseDate,
+        cast,
+        director,
+        duration,
         synopsis,
       };
       const result = await movieModel.postMovie(setData);

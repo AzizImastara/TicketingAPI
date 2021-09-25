@@ -5,7 +5,7 @@ module.exports = {
   getAllSchedule: async (req, res) => {
     const searchBy = !req.query.searchBy ? "movieId" : req.query.searchBy;
     const search = !req.query.search ? "" : req.query.search;
-    const sort = !req.query.sort ? "ASC" : req.query.sort;
+    const sort = !req.query.sort ? "DESC" : req.query.sort;
     const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
     const page = !req.query.page ? "1" : Number(req.query.page);
     const offset = page === 1 ? "0" : (page - 1) * dblimit;
@@ -26,6 +26,7 @@ module.exports = {
         dblimit,
         offset
       );
+      // proses  time
       return helperWrapper.response(
         res,
         200,
@@ -66,7 +67,7 @@ module.exports = {
   },
   postSchedule: async (req, res) => {
     try {
-      const { movieId, premiere, price, location, dateStart, dateEnd } =
+      const { movieId, premiere, price, location, dateStart, dateEnd, time } =
         req.body;
       const setData = {
         movieId,
@@ -75,6 +76,7 @@ module.exports = {
         location,
         dateStart,
         dateEnd,
+        time,
       };
       const result = await scheduleModel.postSchedule(setData);
       return helperWrapper.response(res, 200, "Success create data", result);
