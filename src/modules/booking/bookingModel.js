@@ -4,7 +4,7 @@ module.exports = {
   getBookingById: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT * FROM Booking WHERE Booking.id = ${id}`,
+        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM Booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.id=${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -14,10 +14,10 @@ module.exports = {
         }
       );
     }),
-  getBookingByIdUser: (idUser) =>
+  getBookingByIdUser: (userId) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT * FROM Booking WHERE Booking.userId = ${idUser} `,
+        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM Booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.userId=${userId}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -27,12 +27,20 @@ module.exports = {
         }
       );
     }),
-  // getSeatBooking: (id) =>
-  //   new Promise((resolve, reject) => {
-  //     connection.query(
-  //       `SELECT * FROM Booking WHERE `
-  //     )
-  //   })
+  getSeatBooking: (where) =>
+    new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT seat.id, seat.seat FROM bookingSeat AS seat WHERE ?`,
+        where,
+        (error, result) => {
+          if (!error) {
+            resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
+        }
+      );
+    }),
 
   postBooking: (data) =>
     new Promise((resolve, reject) => {

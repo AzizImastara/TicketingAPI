@@ -27,11 +27,19 @@ module.exports = {
         offset
       );
       // proses  time
+      const newResult = result.map((item) => {
+        const data = {
+          ...item,
+          time: item.time.split(","),
+        };
+        return data;
+      });
+
       return helperWrapper.response(
         res,
         200,
         "Success get data",
-        result,
+        newResult,
         pageInfo
       );
     } catch (error) {
@@ -101,20 +109,28 @@ module.exports = {
           null
         );
       }
-      const { movieId, premiere, price, location, dateStart, dateEnd } =
-        req.body;
-      const setData = {
-        movieId,
-        premiere,
-        price,
-        location,
-        dateStart,
-        dateEnd,
-        updateAt: new Date(Date.now()),
-      };
+      // const { movieId, premiere, price, location, dateStart, dateEnd } =
+      //   req.body;
+      // const setData = {
+      //   movieId,
+      //   premiere,
+      //   price,
+      //   location,
+      //   dateStart,
+      //   dateEnd,
+      //   updateAt: new Date(Date.now()),
+      // };
 
-      const result = await scheduleModel.updateSchedule(setData, id);
-      return helperWrapper.response(res, 200, "Success update data", result);
+      const updateData = await scheduleModel.updateSchedule(
+        { ...req.body, updateAt: new Date(Date.now()) },
+        id
+      );
+      return helperWrapper.response(
+        res,
+        200,
+        "Success update data",
+        updateData
+      );
     } catch (error) {
       return helperWrapper.response(
         res,

@@ -101,28 +101,16 @@ module.exports = {
           null
         );
       }
-      const {
-        name,
-        category,
-        releaseDate,
-        cast,
-        director,
-        duration,
-        synopsis,
-      } = req.body;
-      const setData = {
-        name,
-        category,
-        releaseDate,
-        cast,
-        director,
-        duration,
-        synopsis,
-        updateAt: new Date(Date.now()),
-      };
-
-      const result = await movieModel.updateMovie(setData, id);
-      return helperWrapper.response(res, 200, "Success update data", result);
+      const updateData = await movieModel.updateMovie(
+        { ...req.body, updateAt: new Date(Date.now()) },
+        id
+      );
+      return helperWrapper.response(
+        res,
+        200,
+        "Success update data",
+        updateData
+      );
     } catch (error) {
       return helperWrapper.response(
         res,
@@ -144,11 +132,6 @@ module.exports = {
           null
         );
       }
-      // Proses delete
-      // return res.status(200).json({
-      //   status: true,
-      //   message: "Delete Data Success",
-      // });
       const result = await movieModel.deleteMovie(id);
       return helperWrapper.response(res, 200, "Success update data", result);
     } catch (error) {
