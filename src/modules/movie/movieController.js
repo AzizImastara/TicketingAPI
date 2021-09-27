@@ -4,7 +4,7 @@ const helperWrapper = require("../../helpers/wrapper");
 
 module.exports = {
   getAllMovie: async (req, res) => {
-    const seacrh = !req.query.seacrh ? "" : req.query.seacrh;
+    const search = !req.query.search ? "" : req.query.search;
     const sort = !req.query.sort ? "DESC" : req.query.sort;
     const page = !req.query.page ? "1" : Number(req.query.page);
     const limit = !req.query.limit ? "10" : Number(req.query.limit);
@@ -19,7 +19,7 @@ module.exports = {
     };
 
     try {
-      const result = await movieModel.getAllMovie(seacrh, sort, limit, offset);
+      const result = await movieModel.getAllMovie(search, sort, limit, offset);
       return helperWrapper.response(
         res,
         200,

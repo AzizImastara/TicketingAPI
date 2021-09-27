@@ -27,11 +27,10 @@ module.exports = {
         }
       );
     }),
-  getSeatBooking: (where) =>
+  getSeatBooking: (movieId, scheduleId, dateBooking, timeBooking) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT seat.id, seat.seat FROM bookingSeat AS seat WHERE ?`,
-        where,
+        `SELECT bs.id, bs.seat FROM bookingSeat AS bs WHERE bs.movieId = ${movieId} && bs.scheduleId = ${scheduleId} && bs.dateBooking = '${dateBooking}' && bs.timeBooking = '${timeBooking}'`,
         (error, result) => {
           if (!error) {
             resolve(result);

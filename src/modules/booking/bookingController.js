@@ -50,11 +50,20 @@ module.exports = {
           null
         );
       }
+      const newResult = result.map((item) => {
+        const data = item.seat
+          ? {
+              ...item,
+              seat: item.seat.split(","),
+            }
+          : item;
+        return data;
+      });
       return helperWrapper.response(
         res,
         200,
         "Success get data by idUser",
-        result
+        newResult
       );
     } catch (error) {
       return helperWrapper.response(
@@ -69,14 +78,17 @@ module.exports = {
     try {
       const { movieId, scheduleId, dateBooking, timeBooking } = req.query;
       const result = await bookingModel.getSeatBooking(
-        movieId || scheduleId || dateBooking || timeBooking
+        movieId,
+        scheduleId,
+        dateBooking,
+        timeBooking
       );
       if (result.length < 1) {
         return helperWrapper.response(
           res,
           404,
           `Data by id ${
-            movieId || scheduleId || dateBooking || timeBooking
+            (movieId, scheduleId, dateBooking, timeBooking)
           } not found`,
           null
         );
