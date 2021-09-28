@@ -5,6 +5,7 @@ const helloRoutes = require("../modules/helloRoutes");
 const movieRoutes = require("../modules/movie/movieRoutes");
 const scheduleRoutes = require("../modules/schedule/scheduleRoutes");
 const bookingRoutes = require("../modules/booking/bookingRoutes");
+const authRoutes = require("../modules/auth/authRoutes");
 
 // const authRoutes = require(...)
 // Router.get("/hello", (request, response) => {
@@ -16,5 +17,6 @@ Router.use("/hello", helloRoutes);
 Router.use("/movie", movieRoutes);
 Router.use("/schedule", scheduleRoutes);
 Router.use("/booking", bookingRoutes);
+Router.use("/auth", authRoutes);
 
 module.exports = Router;

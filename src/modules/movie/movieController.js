@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 const movieModel = require("./movieModel");
 const helperWrapper = require("../../helpers/wrapper");
+const redis = require("../../config/redis");
 
 module.exports = {
   getAllMovie: async (req, res) => {
@@ -20,6 +20,13 @@ module.exports = {
 
     try {
       const result = await movieModel.getAllMovie(search, sort, limit, offset);
+
+      redis.setex(
+        `getMovie:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result, pageInfo })
+      );
+
       return helperWrapper.response(
         res,
         200,
@@ -48,6 +55,9 @@ module.exports = {
           null
         );
       }
+
+      // PROSES UNTUK MENYIMPAN DATA KEDALAM REDIS
+      redis.setex(`getMovie:${id}`, 3600, JSON.stringify(result));
       return helperWrapper.response(res, 200, "Success get data by id", result);
     } catch (error) {
       return helperWrapper.response(
@@ -133,7 +143,7 @@ module.exports = {
         );
       }
       const result = await movieModel.deleteMovie(id);
-      return helperWrapper.response(res, 200, "Success update data", result);
+      return helperWrapper.response(res, 200, "Success delete data", result);
     } catch (error) {
       return helperWrapper.response(
         res,
