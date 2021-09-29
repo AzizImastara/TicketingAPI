@@ -4,7 +4,7 @@ module.exports = {
   getAllSchedule: (searchBy, search, sort, limit, offset) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT * FROM Schedule LEFT JOIN Movie ON Schedule.movieId = Movie.id WHERE ${searchBy} LIKE '%${search}%' ORDER BY price ${sort} LIMIT ${offset}, ${limit}`,
+        `SELECT * FROM Schedule WHERE ${searchBy} LIKE '%${search}%' ORDER BY price ${sort} LIMIT ${offset}, ${limit}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -15,10 +15,10 @@ module.exports = {
       );
     }),
 
-  getCountSchedule: () =>
+  getCountSchedule: (search) =>
     new Promise((resolve, reject) => {
       connection.query(
-        "SELECT COUNT(*) AS total FROM Schedule",
+        `SELECT COUNT(*) AS total FROM Schedule WHERE movieId LIKE '%${search}%'`,
         (error, result) => {
           if (!error) {
             resolve(result[0].total);

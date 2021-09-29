@@ -9,7 +9,7 @@ module.exports = {
     const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
     const page = !req.query.page ? "1" : Number(req.query.page);
     const offset = page === 1 ? "0" : (page - 1) * dblimit;
-    const totalData = await scheduleModel.getCountSchedule();
+    const totalData = await scheduleModel.getCountSchedule(search);
     const totalPage = Math.ceil(totalData / dblimit);
     const pageInfo = {
       page,
