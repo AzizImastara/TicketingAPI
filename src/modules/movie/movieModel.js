@@ -28,10 +28,10 @@ module.exports = {
         }
       );
     }),
-  getCountMovie: () =>
+  getCountMovie: (search) =>
     new Promise((resolve, reject) => {
       connection.query(
-        "SELECT COUNT(*) AS total FROM Movie",
+        `SELECT COUNT(*) AS total FROM Movie WHERE name LIKE '%${search}%'`,
         (error, result) => {
           if (!error) {
             resolve(result[0].total);

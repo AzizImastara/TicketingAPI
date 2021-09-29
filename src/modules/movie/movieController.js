@@ -1,6 +1,7 @@
 const movieModel = require("./movieModel");
 const helperWrapper = require("../../helpers/wrapper");
 const redis = require("../../config/redis");
+const deleteFile = require("../../helpers/uploads/deleteFile");
 
 module.exports = {
   getAllMovie: async (req, res) => {
@@ -8,8 +9,8 @@ module.exports = {
     const sort = !req.query.sort ? "DESC" : req.query.sort;
     const page = !req.query.page ? "1" : Number(req.query.page);
     const limit = !req.query.limit ? "10" : Number(req.query.limit);
-    const offset = page === 1 ? "0" : (page - 1) * limit;
-    const totalData = await movieModel.getCountMovie();
+    const offset = page * limit - limit;
+    const totalData = await movieModel.getCountMovie(search);
     const totalPage = Math.ceil(totalData / limit);
     const pageInfo = {
       page,
@@ -17,7 +18,6 @@ module.exports = {
       limit,
       totalData,
     };
-
     try {
       const result = await movieModel.getAllMovie(search, sort, limit, offset);
 
@@ -87,6 +87,7 @@ module.exports = {
         director,
         duration,
         synopsis,
+        image: req.file ? req.file.filename : null,
       };
       const result = await movieModel.postMovie(setData);
       return helperWrapper.response(res, 200, "Success create data", result);
@@ -142,6 +143,7 @@ module.exports = {
           null
         );
       }
+      deleteFile(`public/uploads/movie/${checkId[0].image}`);
       const result = await movieModel.deleteMovie(id);
       return helperWrapper.response(res, 200, "Success delete data", result);
     } catch (error) {
