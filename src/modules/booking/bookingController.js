@@ -141,7 +141,20 @@ module.exports = {
         paymentMethod,
         statusPayment,
       };
+
       const result = await bookingModel.postBooking(setData);
+      const { id } = result;
+      seat.map(async (item) => {
+        const data = {
+          bookingId: id,
+          movieId,
+          scheduleId,
+          dateBooking,
+          timeBooking,
+          seat: item,
+        };
+        await bookingModel.postSeatBooking(data);
+      });
       return helperWrapper.response(res, 200, "Success create data", result);
     } catch (error) {
       return helperWrapper.response(
