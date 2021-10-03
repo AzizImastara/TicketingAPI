@@ -5,6 +5,7 @@ const helperWrapper = require("../../helpers/wrapper");
 const modelAuth = require("./authModel");
 const redis = require("../../config/redis");
 const authModel = require("./authModel");
+// const deleteFile = require("../../helpers/uploads/deleteFile");
 
 module.exports = {
   register: async (req, res) => {
@@ -179,6 +180,7 @@ module.exports = {
         },
         id
       );
+      // deleteFile(`public/uploads/movie/${checkId[0].image}`);
       return helperWrapper.response(
         res,
         200,

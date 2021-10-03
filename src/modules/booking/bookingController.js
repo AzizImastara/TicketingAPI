@@ -117,6 +117,26 @@ module.exports = {
       );
     }
   },
+  getDashboard: async (req, res) => {
+    const movieId = !req.query.movieId ? "" : req.query.movieId;
+    const location = !req.query.location ? "" : req.query.location;
+    const premiere = !req.query.premiere ? "" : req.query.premiere;
+    try {
+      const result = await bookingModel.getDashboard(
+        movieId,
+        location,
+        premiere
+      );
+      return helperWrapper.response(res, 200, "Success get dashboard", result);
+    } catch (error) {
+      return helperWrapper.response(
+        res,
+        400,
+        `Bad request (${error.message})`,
+        null
+      );
+    }
+  },
   postBooking: async (req, res) => {
     try {
       const {

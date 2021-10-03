@@ -55,7 +55,6 @@ module.exports = {
         }
       });
     }),
-
   postSeatBooking: (data) =>
     new Promise((resolve, reject) => {
       connection.query(
@@ -68,6 +67,19 @@ module.exports = {
               ...data,
             };
             resolve(newResult);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
+        }
+      );
+    }),
+  getDashboard: () =>
+    new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT MONTH(createdAt) AS month, SUM(totalPayment) AS total FROM Booking WHERE YEAR(createdAt) = YEAR(NOW()) GROUP BY MONTH(createdAt)`,
+        (error, result) => {
+          if (!error) {
+            resolve(result);
           } else {
             reject(new Error(`SQL : ${error.sqlMessage}`));
           }
