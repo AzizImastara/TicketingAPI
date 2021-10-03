@@ -112,8 +112,17 @@ module.exports = {
           null
         );
       }
+      if (req.file.filename) {
+        deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      }
       const updateData = await movieModel.updateMovie(
-        { ...req.body, updateAt: new Date(Date.now()) },
+        req.file.filename
+          ? {
+              ...req.body,
+              updateAt: new Date(Date.now()),
+              image: req.file.filename,
+            }
+          : { ...req.body, updateAt: new Date(Date.now()) },
         id
       );
       return helperWrapper.response(

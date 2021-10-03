@@ -14,8 +14,6 @@ Router.get(
   movieController.getAllMovie
 );
 // =========
-// Router.get("/", movieController.getAllMovie);
-// =========
 Router.get(
   "/:id",
   middlewareAuth.authentication,
@@ -26,16 +24,25 @@ Router.get(
 Router.post(
   "/",
   middlewareAuth.authentication,
-  middlewareAuth.isAdmin,
+  middlewareAuth.admin,
   middlewareRedis.clearMovieRedis,
   middlewareUpload, // tambahkan middleware upload file
   movieController.postMovie
 );
 // ========
-Router.patch("/:id", movieController.updateMovie);
+Router.patch(
+  "/:id",
+  middlewareAuth.authentication,
+  middlewareAuth.admin,
+  middlewareRedis.clearMovieRedis,
+  middlewareUpload,
+  movieController.updateMovie
+);
 // ========
 Router.delete(
   "/:id",
+  middlewareAuth.authentication,
+  middlewareAuth.admin,
   middlewareRedis.clearMovieRedis,
   movieController.deleteMovie
 );
