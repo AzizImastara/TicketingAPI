@@ -12,6 +12,7 @@ Router.patch("/updatePassword/:id", authController.updatePassword);
 Router.patch("/updateProfile/:id", authController.updateProfile);
 Router.patch("/updateImage/:id", middlewareUpload, authController.updateImage);
 Router.post("/logout", authController.logout);
+Router.get("/active/:id", authController.getActive);
 
 // Router.get("/", (resquest, response) => {
 //   response.send("Hello World");

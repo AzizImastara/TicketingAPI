@@ -52,6 +52,9 @@ module.exports = {
       if (!comparePw) {
         return helperWrapper.response(res, 400, "Wrong password", null);
       }
+      if (checkUser[0].status === "nonActive") {
+        return helperWrapper.response(res, 400, "account must be active", null);
+      }
       // PROSES UTAMA MEMBUAT TOKEN MENGGUNAKAN JWT (data yang mau diubah, kata kunci , lama token bisa digunakan)
       const payload = checkUser[0];
       delete payload.password;
@@ -202,6 +205,24 @@ module.exports = {
       token = token.split(" ")[1];
       redis.setex(`accessToken:${token}`, 3600 * 24, token);
       return helperWrapper.response(res, 200, "Success logout", null);
+    } catch (error) {
+      return helperWrapper.response(
+        res,
+        400,
+        `Bad request (${error.message})`,
+        null
+      );
+    }
+  },
+  getActive: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = { status: "active" };
+      const result = await authModel.updateProfile(data, id);
+      if (result.length < 1) {
+        return helperWrapper.response(res, 404, `Data user nor found`, null);
+      }
+      return helperWrapper.response(res, 200, "Success change status", result);
     } catch (error) {
       return helperWrapper.response(
         res,

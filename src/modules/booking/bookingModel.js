@@ -73,13 +73,31 @@ module.exports = {
         }
       );
     }),
-  getDashboard: () =>
+  getDashboard: (movieId, location, premiere) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT MONTH(createdAt) AS month, SUM(totalPayment) AS total FROM Booking WHERE YEAR(createdAt) = YEAR(NOW()) GROUP BY MONTH(createdAt)`,
+        `SELECT MONTHNAME(Booking.createdAt) AS month, SUM(totalPayment) AS total FROM Booking LEFT JOIN Schedule ON Booking.movieId = Schedule.movieId WHERE Booking.movieId = ${movieId} AND Schedule.location = "${location}" AND Schedule.premiere = "${premiere}" AND YEAR(Booking.createdAt) = YEAR (NOW()) GROUP BY MONTH(Booking.createdAt)`,
         (error, result) => {
           if (!error) {
             resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
+        }
+      );
+    }),
+  getQR: (data, id) =>
+    new Promise((resolve, reject) => {
+      connection.query(
+        `UPDATE Booking SET ? WHERE id = ?`,
+        [data, id],
+        (error) => {
+          if (!error) {
+            const newResult = {
+              id,
+              ...data,
+            };
+            resolve(newResult);
           } else {
             reject(new Error(`SQL : ${error.sqlMessage}`));
           }

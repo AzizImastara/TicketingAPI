@@ -36,13 +36,6 @@ module.exports = {
       });
     });
   },
-  // custommer: (req, res, next) => {
-  //   const { roles } = req;
-  //   if (roles === "custommer") {
-  //     return next();
-  //   }
-  //   return helperWrapper.response(res, 403, "Forbidden acces");
-  // },
   admin: (req, res, next) => {
     const { authorization } = req.headers;
     const decoded = jwtDecode(authorization.split(" ")[1]);
