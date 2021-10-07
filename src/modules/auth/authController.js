@@ -4,8 +4,7 @@ const bcrypt = require("bcryptjs");
 const helperWrapper = require("../../helpers/wrapper");
 const modelAuth = require("./authModel");
 const redis = require("../../config/redis");
-const authModel = require("./authModel");
-// const deleteFile = require("../../helpers/uploads/deleteFile");
+const sendMail = require("../../helpers/email");
 
 module.exports = {
   register: async (req, res) => {
@@ -27,7 +26,15 @@ module.exports = {
         email,
         password: hash,
       };
-
+      const setDataEmail = {
+        to: email,
+        subject: "Email verification!",
+        template: "email-verification",
+        data: {
+          firstname: "Syahrul AZ",
+        },
+      };
+      await sendMail(setDataEmail);
       const result = await modelAuth.register(setData);
       return helperWrapper.response(res, 200, "Success register user", result);
     } catch (error) {
@@ -60,11 +67,17 @@ module.exports = {
       delete payload.password;
       let token;
       if (email === "admin@gmail.com") {
-        token = jwt.sign({ ...payload, roles: "admin" }, "RAHASIA", {
-          expiresIn: "24h",
-        });
+        token = jwt.sign(
+          { ...payload, roles: "admin" },
+          process.env.SECRET_KEY,
+          {
+            expiresIn: "24h",
+          }
+        );
+        // const refreshToken = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
+        //   expiresIn: "24h",
       } else {
-        token = jwt.sign({ ...payload }, "RAHASIA", {
+        token = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
           expiresIn: "24h",
         });
       }
@@ -72,124 +85,6 @@ module.exports = {
         id: payload.id,
         token,
       });
-    } catch (error) {
-      return helperWrapper.response(
-        res,
-        400,
-        `Bad request (${error.message})`,
-        null
-      );
-    }
-  },
-  getUserById: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const result = await authModel.getUserById(id);
-      if (result.length < 1) {
-        return helperWrapper.response(
-          res,
-          404,
-          `Data by id ${id} not found`,
-          null
-        );
-      }
-      return helperWrapper.response(
-        res,
-        200,
-        "Success get data by id user",
-        result
-      );
-    } catch (error) {
-      return helperWrapper.response(
-        res,
-        400,
-        `Bad request (${error.message})`,
-        null
-      );
-    }
-  },
-  updatePassword: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { newPassword, confirmPassword } = req.body;
-      if (newPassword === confirmPassword) {
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(confirmPassword, salt);
-        const data = { password: hash };
-        const result = await modelAuth.updatePassword(id, data);
-        if (result.affectedRows) {
-          return helperWrapper.response(res, 200, "Success update password");
-        }
-        return helperWrapper.response(res, 200, "Nothing update");
-      }
-      return helperWrapper.response(res, 403, "Password not same");
-    } catch (error) {
-      return helperWrapper.response(
-        res,
-        400,
-        `Bad request (${error.message})`,
-        null
-      );
-    }
-  },
-  updateProfile: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const checkId = await authModel.getUserById(id);
-      if (checkId.length < 1) {
-        return helperWrapper.response(
-          res,
-          404,
-          `Data by id ${id} not found`,
-          null
-        );
-      }
-      const updateData = await authModel.updateProfile(
-        { ...req.body, updateAt: new Date(Date.now()) },
-        id
-      );
-      return helperWrapper.response(
-        res,
-        200,
-        "Success update data",
-        updateData
-      );
-    } catch (error) {
-      return helperWrapper.response(
-        res,
-        400,
-        `Bad request (${error.message})`,
-        null
-      );
-    }
-  },
-  updateImage: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const checkId = await authModel.getUserById(id);
-      if (checkId.length < 1) {
-        return helperWrapper.response(
-          res,
-          404,
-          `Data by id ${id} not found`,
-          null
-        );
-      }
-      const updateData = await authModel.updateProfile(
-        {
-          ...req.body,
-          image: req.file ? req.file.filename : null,
-          updateAt: new Date(Date.now()),
-        },
-        id
-      );
-      // deleteFile(`public/uploads/movie/${checkId[0].image}`);
-      return helperWrapper.response(
-        res,
-        200,
-        "Success update data",
-        updateData
-      );
     } catch (error) {
       return helperWrapper.response(
         res,
@@ -214,22 +109,46 @@ module.exports = {
       );
     }
   },
-  getActive: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const data = { status: "active" };
-      const result = await authModel.updateProfile(data, id);
-      if (result.length < 1) {
-        return helperWrapper.response(res, 404, `Data user nor found`, null);
-      }
-      return helperWrapper.response(res, 200, "Success change status", result);
-    } catch (error) {
-      return helperWrapper.response(
-        res,
-        400,
-        `Bad request (${error.message})`,
-        null
-      );
-    }
-  },
+  // refreshToken: async (req, res) => {
+  //   try {
+  //     // console.log(req.body);
+  //     const { refreshToken } = req.body;
+  //     // PROSES PENGECEKAN REFRESH TOKEN APAKAH BISA DIGUNAKAN ATAU TIDAK
+  //     redis.get(`refreshToken:${refreshToken}`, (error, result) => {
+  //       if (!error && result !== null) {
+  //         return helperWrapper.response(
+  //           res,
+  //           403,
+  //           "Your refresh token cannot be use"
+  //         );
+  //       }
+  //       jwt.verify(refreshToken, process.env.SECRET_KEY, (error, result) => {
+  //         if (error) {
+  //           return helperWrapper.response(res, 403, error.message);
+  //         }
+  //         delete result.iat;
+  //         delete result.exp;
+  //         const token = jwt.sign(result, process.env.SECRET_KEY, {
+  //           expiresIn: "1h",
+  //         });
+  //         const newRefreshToken = jwt.sign(result, process.env.SECRET_KEY, {
+  //           expiresIn: "24h",
+  //         });
+  //         redis.setex(`refreshToken:${refreshToken}`, 3600 * 24, refreshToken);
+  //         return helperWrapper.response(res, 200, "Success Refresh Token !", {
+  //           id: result.id,
+  //           token,
+  //           refreshToken: newRefreshToken,
+  //         });
+  //       });
+  //     });
+  //   } catch (error) {
+  //     return helperWrapper.response(
+  //       res,
+  //       400,
+  //       `Bad request (${error.message})`,
+  //       null
+  //     );
+  //   }
+  // },
 };

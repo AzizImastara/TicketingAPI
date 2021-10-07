@@ -4,7 +4,7 @@ module.exports = {
   getBookingById: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM Booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.id=${id}`,
+        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.id=${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -17,7 +17,7 @@ module.exports = {
   getBookingByIdUser: (userId) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM Booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.userId=${userId}`,
+        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.userId=${userId}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -43,7 +43,7 @@ module.exports = {
 
   postBooking: (data) =>
     new Promise((resolve, reject) => {
-      connection.query("INSERT INTO Booking SET ?", data, (error, result) => {
+      connection.query("INSERT INTO booking SET ?", data, (error, result) => {
         if (!error) {
           const newResult = {
             id: result.insertId,
@@ -76,7 +76,7 @@ module.exports = {
   getDashboard: (movieId, location, premiere) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT MONTHNAME(Booking.createdAt) AS month, SUM(totalPayment) AS total FROM Booking LEFT JOIN Schedule ON Booking.movieId = Schedule.movieId WHERE Booking.movieId = ${movieId} AND Schedule.location = "${location}" AND Schedule.premiere = "${premiere}" AND YEAR(Booking.createdAt) = YEAR (NOW()) GROUP BY MONTH(Booking.createdAt)`,
+        `SELECT MONTHNAME(booking.createdAt) AS month, SUM(totalPayment) AS total FROM booking LEFT JOIN schedule ON booking.movieId = schedule.movieId WHERE booking.movieId = ${movieId} AND schedule.location = "${location}" AND schedule.premiere = "${premiere}" AND YEAR(booking.createdAt) = YEAR (NOW()) GROUP BY MONTH(booking.createdAt)`,
         (error, result) => {
           if (!error) {
             resolve(result);

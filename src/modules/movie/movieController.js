@@ -112,7 +112,7 @@ module.exports = {
           null
         );
       }
-      if (req.file.filename) {
+      if (req.file.filename && checkId[0].image) {
         deleteFile(`public/uploads/movie/${checkId[0].image}`);
       }
       const updateData = await movieModel.updateMovie(
@@ -152,7 +152,9 @@ module.exports = {
           null
         );
       }
-      deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      if (checkId[0].image) {
+        deleteFile(`public/uploads/movie/${checkId[0].image}`);
+      }
       const result = await movieModel.deleteMovie(id);
       return helperWrapper.response(res, 200, "Success delete data", result);
     } catch (error) {

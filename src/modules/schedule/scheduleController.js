@@ -160,7 +160,7 @@ module.exports = {
         );
       }
       const result = await scheduleModel.deleteSchedule(id);
-      return helperWrapper.response(res, 200, "Success update data", result);
+      return helperWrapper.response(res, 200, "Success delete data", result);
     } catch (error) {
       return helperWrapper.response(
         res,
