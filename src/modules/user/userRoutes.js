@@ -10,6 +10,5 @@ Router.get("/user/:id", userController.getUserById);
 Router.patch("/updatePassword/:id", userController.updatePassword);
 Router.patch("/updateProfile/:id", userController.updateProfile);
 Router.patch("/updateImage/:id", middlewareUpload, userController.updateImage);
-Router.get("/active/:id", userController.getActive);
 
 module.exports = Router;
