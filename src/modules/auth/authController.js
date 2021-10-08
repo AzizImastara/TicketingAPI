@@ -67,25 +67,20 @@ module.exports = {
       // PROSES UTAMA MEMBUAT TOKEN MENGGUNAKAN JWT (data yang mau diubah, kata kunci , lama token bisa digunakan)
       const payload = checkUser[0];
       delete payload.password;
-      let token;
-      if (email === "admin@gmail.com") {
-        token = jwt.sign(
-          { ...payload, roles: "admin" },
-          process.env.SECRET_KEY,
-          {
-            expiresIn: "24h",
-          }
-        );
-        // const refreshToken = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
-        //   expiresIn: "24h",
-      } else {
-        token = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
-          expiresIn: "24h",
-        });
-      }
+
+      const token = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
+        expiresIn: "24h",
+      });
+
+      // ADD REFRESH TOKEN
+      const refreshToken = jwt.sign({ ...payload }, process.env.SECRET_KEY, {
+        expiresIn: "72h",
+      });
+
       return helperWrapper.response(res, 200, "Success login", {
         id: payload.id,
         token,
+        refreshToken,
       });
     } catch (error) {
       return helperWrapper.response(
@@ -131,46 +126,53 @@ module.exports = {
       );
     }
   },
-  // refreshToken: async (req, res) => {
-  //   try {
-  //     // console.log(req.body);
-  //     const { refreshToken } = req.body;
-  //     // PROSES PENGECEKAN REFRESH TOKEN APAKAH BISA DIGUNAKAN ATAU TIDAK
-  //     redis.get(`refreshToken:${refreshToken}`, (error, result) => {
-  //       if (!error && result !== null) {
-  //         return helperWrapper.response(
-  //           res,
-  //           403,
-  //           "Your refresh token cannot be use"
-  //         );
-  //       }
-  //       jwt.verify(refreshToken, process.env.SECRET_KEY, (error, result) => {
-  //         if (error) {
-  //           return helperWrapper.response(res, 403, error.message);
-  //         }
-  //         delete result.iat;
-  //         delete result.exp;
-  //         const token = jwt.sign(result, process.env.SECRET_KEY, {
-  //           expiresIn: "1h",
-  //         });
-  //         const newRefreshToken = jwt.sign(result, process.env.SECRET_KEY, {
-  //           expiresIn: "24h",
-  //         });
-  //         redis.setex(`refreshToken:${refreshToken}`, 3600 * 24, refreshToken);
-  //         return helperWrapper.response(res, 200, "Success Refresh Token !", {
-  //           id: result.id,
-  //           token,
-  //           refreshToken: newRefreshToken,
-  //         });
-  //       });
-  //     });
-  //   } catch (error) {
-  //     return helperWrapper.response(
-  //       res,
-  //       400,
-  //       `Bad request (${error.message})`,
-  //       null
-  //     );
-  //   }
-  // },
+
+  refreshToken: async (req, res) => {
+    try {
+      const { refreshToken } = req.body;
+
+      // PROSES PENGECEKAN REFRESH TOKEN APAKAH BISA DIGUNAKAN ATAU TIDAK
+      redis.get(`refreshToken:${refreshToken}`, (err, result) => {
+        if (!err && result !== null) {
+          return helperWrapper.response(
+            res,
+            403,
+            "Your refresh token cannot be use"
+          );
+        }
+
+        jwt.verify(refreshToken, process.env.SECRET_KEY, (error, result) => {
+          if (error) {
+            return helperWrapper.response(res, 403, error.message);
+          }
+
+          delete result.iat;
+          delete result.exp;
+
+          const token = jwt.sign(result, process.env.SECRET_KEY, {
+            expiresIn: "24h",
+          });
+
+          const newRefreshToken = jwt.sign(result, process.env.SECRET_KEY, {
+            expiresIn: "72h",
+          });
+
+          redis.setex(`refreshToken:${refreshToken}`, 3600 * 72, refreshToken);
+
+          return helperWrapper.response(res, 200, "Success Refresh Token !", {
+            id: result.id,
+            token,
+            refreshToken: newRefreshToken,
+          });
+        });
+      });
+    } catch (error) {
+      return helperWrapper.response(
+        res,
+        400,
+        `Bad request (${error.message})`,
+        null
+      );
+    }
+  },
 };

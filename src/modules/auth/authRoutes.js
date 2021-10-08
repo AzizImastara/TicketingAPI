@@ -8,7 +8,6 @@ Router.post("/register", authController.register);
 Router.post("/login", authController.login);
 Router.post("/logout", authController.logout);
 Router.get("/active/:id", authController.getActive);
-
-// Router.post("/refresh", authController.refreshToken);
+Router.post("/refresh", authController.refreshToken);
 
 module.exports = Router;
