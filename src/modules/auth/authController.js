@@ -32,7 +32,7 @@ module.exports = {
         subject: "Email verification!",
         template: "email-verification",
         data: {
-          firstname: "Syahrul AZ",
+          firstname: "Syahrul Aziz",
         },
       };
       await sendMail(setDataEmail);
