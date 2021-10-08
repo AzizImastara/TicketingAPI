@@ -5,6 +5,7 @@ const helperWrapper = require("../../helpers/wrapper");
 const modelAuth = require("./authModel");
 const redis = require("../../config/redis");
 const sendMail = require("../../helpers/email");
+const authModel = require("./authModel");
 
 module.exports = {
   register: async (req, res) => {
@@ -46,6 +47,7 @@ module.exports = {
       );
     }
   },
+
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -94,12 +96,32 @@ module.exports = {
       );
     }
   },
+
   logout: async (req, res) => {
     try {
       let token = req.headers.authorization;
       token = token.split(" ")[1];
       redis.setex(`accessToken:${token}`, 3600 * 24, token);
       return helperWrapper.response(res, 200, "Success logout", null);
+    } catch (error) {
+      return helperWrapper.response(
+        res,
+        400,
+        `Bad request (${error.message})`,
+        null
+      );
+    }
+  },
+
+  getActive: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = { status: "active" };
+      const result = await authModel.getActive(data, id);
+      if (result.length < 1) {
+        return helperWrapper.response(res, 404, `Data user nor found`, null);
+      }
+      return helperWrapper.response(res, 200, "Success change status", result);
     } catch (error) {
       return helperWrapper.response(
         res,
