@@ -5,28 +5,27 @@ module.exports = {
   getBookingById: async (req, res) => {
     try {
       const { id } = req.params;
+
       const result = await bookingModel.getBookingById(id);
       if (result.length < 1) {
         return helperWrapper.response(
           res,
           404,
-          `Data by id ${id} not found`,
+          `Data by id ${id} not found !`,
           null
         );
       }
-      const newResult = result.map((item) => {
-        const data = item.seat
-          ? {
-              ...item,
-              seat: item.seat.split(","),
-            }
-          : item;
-        return data;
+
+      const newResult = [{ ...result[0], seat: [] }];
+
+      result.forEach((item) => {
+        newResult[0].seat.push(item.seat);
       });
+
       return helperWrapper.response(
         res,
         200,
-        "Success get data by id",
+        `Success get data by id`,
         newResult
       );
     } catch (error) {
@@ -41,28 +40,27 @@ module.exports = {
   getBookingByIdUser: async (req, res) => {
     try {
       const { userId } = req.params;
+
       const result = await bookingModel.getBookingByIdUser(userId);
       if (result.length < 1) {
         return helperWrapper.response(
           res,
           404,
-          `Data by id ${userId} not found`,
+          `Data by id ${userId} not found !`,
           null
         );
       }
-      const newResult = result.map((item) => {
-        const data = item.seat
-          ? {
-              ...item,
-              seat: item.seat.split(","),
-            }
-          : item;
-        return data;
+
+      const newResult = [{ ...result[0], seat: [] }];
+
+      result.forEach((item) => {
+        newResult[0].seat.push(item.seat);
       });
+
       return helperWrapper.response(
         res,
         200,
-        "Success get data by idUser",
+        `Success get data by id`,
         newResult
       );
     } catch (error) {
