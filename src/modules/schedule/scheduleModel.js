@@ -1,10 +1,14 @@
 const connection = require("../../config/mysql");
 
 module.exports = {
-  getAllSchedule: (searchBy, search, sort, limit, offset) =>
+  getAllSchedule: (searchBy, search, sort, limit, offset, dateStart, dateEnd) =>
     new Promise((resolve, reject) => {
+      console.log(dateEnd);
+      console.log(
+        `SELECT * FROM schedule WHERE dateStart >= ${dateStart} AND dateEnd <= ${dateEnd} AND ${searchBy} LIKE '%${search}%' ORDER BY price ${sort} LIMIT ${offset}, ${limit}`
+      );
       connection.query(
-        `SELECT * FROM schedule WHERE ${searchBy} LIKE '%${search}%' ORDER BY price ${sort} LIMIT ${offset}, ${limit}`,
+        `SELECT * FROM schedule WHERE dateStart >= '${dateStart}' AND dateEnd <= '${dateEnd}' AND ${searchBy} LIKE '%${search}%' ORDER BY price ${sort} LIMIT ${offset}, ${limit}`,
         (error, result) => {
           if (!error) {
             resolve(result);

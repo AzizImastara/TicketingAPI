@@ -27,18 +27,21 @@ module.exports = {
         email,
         password: hash,
       };
+      const result = await modelAuth.register(setData);
+
       const setDataEmail = {
         to: email,
         subject: "Email verification!",
         template: "email-verification",
         data: {
-          firstname: "Syahrul Aziz",
+          firstname: result.firstName,
+          id: result.id,
         },
       };
       await sendMail(setDataEmail);
-      const result = await modelAuth.register(setData);
       return helperWrapper.response(res, 200, "Success register user", result);
     } catch (error) {
+      console.log(error);
       return helperWrapper.response(
         res,
         400,

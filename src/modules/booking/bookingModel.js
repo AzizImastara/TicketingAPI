@@ -44,6 +44,7 @@ module.exports = {
   postBooking: (data) =>
     new Promise((resolve, reject) => {
       connection.query("INSERT INTO booking SET ?", data, (error, result) => {
+        // console.log(error);
         if (!error) {
           const newResult = {
             id: result.insertId,

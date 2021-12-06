@@ -9,8 +9,9 @@ module.exports = {
     const sort = !req.query.sort ? "DESC" : req.query.sort;
     const page = !req.query.page ? "1" : Number(req.query.page);
     const limit = !req.query.limit ? "10" : Number(req.query.limit);
+    const filter = !req.query.filter ? "" : Number(req.query.filter);
     const offset = page * limit - limit;
-    const totalData = await movieModel.getCountMovie(search);
+    const totalData = await movieModel.getCountMovie(search, filter);
     const totalPage = Math.ceil(totalData / limit);
     const pageInfo = {
       page,
@@ -19,7 +20,13 @@ module.exports = {
       totalData,
     };
     try {
-      const result = await movieModel.getAllMovie(search, sort, limit, offset);
+      const result = await movieModel.getAllMovie(
+        search,
+        sort,
+        limit,
+        offset,
+        filter
+      );
 
       redis.setex(
         `getMovie:${JSON.stringify(req.query)}`,

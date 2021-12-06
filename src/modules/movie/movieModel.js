@@ -1,10 +1,12 @@
 const connection = require("../../config/mysql");
 
 module.exports = {
-  getAllMovie: (search, sort, limit, offset) =>
+  getAllMovie: (search, sort, limit, offset, filter) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT * FROM movie WHERE name LIKE '%${search}%' ORDER BY releaseDate ${sort}, name ${sort} LIMIT ${offset}, ${limit}`,
+        `SELECT * FROM movie WHERE ${
+          filter && `MONTH(releaseDate) = ${filter} AND`
+        }  name LIKE '%${search}%' ORDER BY releaseDate ${sort}, name ${sort} LIMIT ${offset}, ${limit}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -14,6 +16,13 @@ module.exports = {
         }
       );
     }),
+
+  // getAllByMonth: (search, sort, limit, offset,filter)=>
+  //   new Promise((resolve, reject) => {
+  //     connection.query(
+
+  //     )
+  //   })
   getMovieByid: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
@@ -28,10 +37,12 @@ module.exports = {
         }
       );
     }),
-  getCountMovie: (search) =>
+  getCountMovie: (search, filter) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT COUNT(*) AS total FROM movie WHERE name LIKE '%${search}%'`,
+        `SELECT COUNT(*) AS total FROM movie WHERE ${
+          filter && `MONTH(releaseDate) = ${filter} AND`
+        } name LIKE '%${search}%'`,
         (error, result) => {
           if (!error) {
             resolve(result[0].total);

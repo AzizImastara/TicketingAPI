@@ -9,6 +9,12 @@ module.exports = {
     const sort = !req.query.sort ? "DESC" : req.query.sort;
     const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
     const page = !req.query.page ? "1" : Number(req.query.page);
+    const dateStart = !req.query.dateStart
+      ? new Date().toISOString().split("T")[0]
+      : req.query.dateStart;
+    const dateEnd = !req.query.dateEnd
+      ? new Date("2100-01-01").toISOString().split("T")[0]
+      : req.query.dateEnd;
     const offset = page === 1 ? "0" : (page - 1) * dblimit;
     const totalData = await scheduleModel.getCountSchedule(search);
     const totalPage = Math.ceil(totalData / dblimit);
@@ -20,12 +26,16 @@ module.exports = {
     };
 
     try {
+      console.log(dateStart);
+      console.log(dateEnd);
       const result = await scheduleModel.getAllSchedule(
         searchBy,
         search,
         sort,
         dblimit,
-        offset
+        offset,
+        dateStart,
+        dateEnd
       );
       // proses  time
       const newResult = result.map((item) => {
@@ -38,7 +48,7 @@ module.exports = {
       redis.setex(
         `getSchedule:${JSON.stringify(req.query)}`,
         3600,
-        JSON.stringify({ result, pageInfo })
+        JSON.stringify({ newResult, pageInfo })
       );
 
       return helperWrapper.response(
