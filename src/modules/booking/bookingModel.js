@@ -90,7 +90,7 @@ module.exports = {
   getQR: (data, id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `UPDATE Booking SET ? WHERE id = ?`,
+        `UPDATE booking SET ? WHERE id = ?`,
         [data, id],
         (error) => {
           if (!error) {
