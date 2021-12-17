@@ -14,10 +14,26 @@ module.exports = {
         }
       );
     }),
+
+  getBooking: (id) =>
+    new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT seat FROM bookingSeat WHERE bookingId=?`,
+        id,
+        (error, result) => {
+          if (!error) {
+            resolve(result);
+          } else {
+            reject(new Error(`SQL : ${error.sqlMessage}`));
+          }
+        }
+      );
+    }),
   getBookingByIdUser: (userId) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.userId=${userId}`,
+        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment FROM booking AS b WHERE b.userId=?`,
+        userId,
         (error, result) => {
           if (!error) {
             resolve(result);

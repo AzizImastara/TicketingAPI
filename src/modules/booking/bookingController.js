@@ -51,18 +51,33 @@ module.exports = {
         );
       }
 
-      const newResult = [{ ...result[0], seat: [] }];
+      // const newResult = [{ ...result[0], seat: [] }];
 
-      result.forEach((item) => {
-        newResult[0].seat.push(item.seat);
-      });
+      // result.forEach((item) => {
+      //   newResult[0].seat.push(item.seat);
+      // });
 
-      return helperWrapper.response(
-        res,
-        200,
-        `Success get data by id`,
-        newResult
-      );
+      // return helperWrapper.response(
+      //   res,
+      //   200,
+      //   `Success get data by id`,
+      //   newResult
+      // );
+
+      // eslint-disable-next-line no-restricted-syntax
+      for (const value of result) {
+        // console.log(value);
+        // eslint-disable-next-line no-await-in-loop
+        const newSeat = await bookingModel.getBooking(value.id);
+        // eslint-disable-next-line no-shadow
+        const dataSeat = newSeat.map((value) => value.seat);
+        // console.log(dataSeat);
+        value.seat = dataSeat;
+      }
+
+      return helperWrapper.response(res, 200, `Success get data by id`, result);
+
+      // console.log(result);
     } catch (error) {
       return helperWrapper.response(
         res,

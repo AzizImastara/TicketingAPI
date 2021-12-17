@@ -4,30 +4,27 @@ const redis = require("../../config/redis");
 
 module.exports = {
   getAllSchedule: async (req, res) => {
-    const searchBy = !req.query.searchBy ? "movieId" : req.query.searchBy;
-    const search = !req.query.search ? "" : req.query.search;
-    const sort = !req.query.sort ? "DESC" : req.query.sort;
-    const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
-    const page = !req.query.page ? "1" : Number(req.query.page);
-    const dateStart = !req.query.dateStart
-      ? new Date().toISOString().split("T")[0]
-      : req.query.dateStart;
-    const dateEnd = !req.query.dateEnd
-      ? new Date("2100-01-01").toISOString().split("T")[0]
-      : req.query.dateEnd;
-    const offset = page === 1 ? "0" : (page - 1) * dblimit;
-    const totalData = await scheduleModel.getCountSchedule(search);
-    const totalPage = Math.ceil(totalData / dblimit);
-    const pageInfo = {
-      page,
-      totalPage,
-      dblimit,
-      totalData,
-    };
-
     try {
-      console.log(dateStart);
-      console.log(dateEnd);
+      const searchBy = !req.query.searchBy ? "movieId" : req.query.searchBy;
+      const search = !req.query.search ? "" : req.query.search;
+      const sort = !req.query.sort ? "DESC" : req.query.sort;
+      const dblimit = !req.query.dblimit ? "10" : Number(req.query.dblimit);
+      const page = !req.query.page ? "1" : Number(req.query.page);
+      const dateStart = !req.query.dateStart ? "" : req.query.dateStart;
+      const dateEnd = !req.query.dateEnd ? "" : req.query.dateEnd;
+      const offset = page === 1 ? "0" : (page - 1) * dblimit;
+      const totalData = await scheduleModel.getCountSchedule(
+        search,
+        dateStart,
+        dateEnd
+      );
+      const totalPage = Math.ceil(totalData / dblimit);
+      const pageInfo = {
+        page,
+        totalPage,
+        dblimit,
+        totalData,
+      };
       const result = await scheduleModel.getAllSchedule(
         searchBy,
         search,
@@ -37,6 +34,7 @@ module.exports = {
         dateStart,
         dateEnd
       );
+      console.log(result.length);
       // proses  time
       const newResult = result.map((item) => {
         const data = {
