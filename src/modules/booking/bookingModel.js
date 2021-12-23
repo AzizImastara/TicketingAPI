@@ -4,7 +4,7 @@ module.exports = {
   getBookingById: (id) =>
     new Promise((resolve, reject) => {
       connection.query(
-        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId WHERE b.id=${id}`,
+        `SELECT movie.name, b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, bs.seat FROM booking AS b LEFT JOIN bookingSeat AS bs ON b.id = bs.bookingId JOIN movie ON b.movieId = movie.id WHERE b.id=${id}`,
         (error, result) => {
           if (!error) {
             resolve(result);
@@ -31,8 +31,8 @@ module.exports = {
     }),
   getBookingByIdUser: (userId) =>
     new Promise((resolve, reject) => {
-      connection.query(
-        `SELECT b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment FROM booking AS b WHERE b.userId=?`,
+      const query = connection.query(
+        `SELECT movie.name, schedule.premiere, b.id, b.userId, b.dateBooking, b.timeBooking, b.movieId, b.scheduleId, b.totalTicket, b.totalPayment, b.statusUse, b.statusPayment FROM booking AS b JOIN movie ON b.movieId = movie.id JOIN schedule ON b.scheduleId = schedule.id WHERE b.userId=?`,
         userId,
         (error, result) => {
           if (!error) {
@@ -42,6 +42,7 @@ module.exports = {
           }
         }
       );
+      console.log(query.sql);
     }),
   getSeatBooking: (movieId, scheduleId, dateBooking, timeBooking) =>
     new Promise((resolve, reject) => {

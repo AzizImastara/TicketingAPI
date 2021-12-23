@@ -55,7 +55,9 @@ module.exports = {
     try {
       const { email, password } = req.body;
       const checkUser = await modelAuth.getUserByEmail(email);
-
+      if (!email || !password) {
+        return helperWrapper.response(res, 400, "Data must be filled");
+      }
       if (checkUser.length < 1) {
         return helperWrapper.response(res, 404, "Email not registered", null);
       }
