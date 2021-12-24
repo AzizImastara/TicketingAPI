@@ -5,9 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      body {
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        margin: auto;
+      }
+  
+      .email-main {
+        text-align: center;
+      }
+  
+    </style>
   </head>
   <body>
-    <h3>Hai, {{firstname}}</h3>
-    <h1>Verification Email <a href='http://localhost:3001/auth/active/{{id}}'>here</a></h1>
+    <section class="email-main">
+      <h3>Hello {{firstname}} 👋🏻, Thank you for registering in Ticketing !</h3>
+      <h1>Verification Email <a href='https://backend-aziz.fwebdev2.xyz/auth/active/{{id}}'>here</a></h1>
+    </section>
   </body>
 </html>
