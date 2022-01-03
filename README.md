@@ -51,5 +51,14 @@ EMAIL_PASS = [your EMAIL TESTER PASSWORD]
 - [Website Ticketing](https://github.com/AzizImastara/fe-tiketingapi)
 - [Mobile Ticketing](https://github.com/AzizImastara/tiketing-native)
 
-## Deploy
-- Soon
+## Postman Documentation
+- Download Postman Collection [here](Ticketing.postman_collection.json)
+- Open your Postman App
+- Import Postman Collection
+- Create Environment in Postman & Set
+```
+Variable : prod
+Initial Value : backend-aziz.fwebdev2.xyz
+Current Value : backend-aziz.fwebdev2.xyz
+```
+
