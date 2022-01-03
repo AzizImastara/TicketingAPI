@@ -52,8 +52,7 @@ EMAIL_PASS = [your EMAIL TESTER PASSWORD]
 - [Mobile Ticketing](https://github.com/AzizImastara/tiketing-native)
 
 ## Postman Documentation
-```
-Documentation [here](https://documenter.getpostman.com/view/17315115/UVRHj48X)
-```
+- Documentation [here](https://documenter.getpostman.com/view/17315115/UVRHj48X)
+
 
 
